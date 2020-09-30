@@ -1,5 +1,5 @@
 ---
-title: "Homework 1"
+title: "Homework 2"
 author: Diana Sanchez
 output: github_document
 ---
@@ -8,80 +8,73 @@ This is my solution to HW1.
 
 ``` {r}
 library(tidyverse)
+library(readxl)
 ```
-
 
 ## Problem 1
 
-Create a data frame with the specified elements.
+Read the Mr. Trashwheel data set.
 
 ```{r}
-prob1_df =
+trashweel_df=
+  read_xlsx(
+    "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", 
+    sheet = "Mr. Trash Wheel", 
+    range = cell_cols("A:N")) %>%
+  janitor::clean_names() %>%
+  drop_na(dumpster) %>%
+  mutate(
+    sports_balls = round(sports_balls),
+    sports_balls = as.integer(sports_balls)
+  )
+```
+
+Read precipitation data for 2018 and 2017.
+
+```{r}
+precip_2018 = 
+  read_xlsx(
+    "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",
+    sheet = "2018 Precipitation",
+    skip = 1
+  ) %>%
+  janitor::clean_names() %>%
+  drop_na(month) %>%
+  mutate (year = 2018) %>%
+  relocate(year)
+
+precip_2017 = 
+  read_xlsx(
+    "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx",
+    sheet = "2017 Precipitation",
+    skip = 1
+  ) %>%
+  janitor::clean_names() %>%
+  drop_na(month) %>%
+  mutate (year = 2017) %>%
+  relocate(year)
+```
+
+Combine annual precipitation.
+
+```{r}
+month_df=
   tibble(
-    samp = rnorm(10),
-    samp_gt_0 = samp > 0,
-    char_vec = c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j"),
-    factor_vec = factor(c("low", "low", "low", "mod", "mod", "mod", "mod", "high", "high", "high"))
-)
+    month = 1:12,
+    month_name = month.name
+  )
+
+precip_df=
+  bind_rows(precip_2018, precip_2017)
+
+left_join(precip_df, month_df, by = "month")
 ```
 
-Take the mean of each variable in my data frame.
+Summarize Mr. Trash Wheel data
 
-```{r}
-mean(pull(prob1_df, samp))
-mean(pull(prob1_df, samp_gt_0))
-mean(pull(prob1_df, char_vec))
-mean(pull(prob1_df, factor_vec))
-```
+This dataset contains information from the MR. Trashwheel trash collector in Baltimore. As trash enters the inner harbor, the trashweel collects that trash, and stores it in a dumpstore. The dataset contains information on year, month, and trash collected, including some specific kinds of trash. There are a total of `r nrow(trashweel_df)` rows in our final document. Additional data sets include month precipitation data.
 
-I can take the mean of numbers and logical, but not character or factor variables
-
-```{r}
-as.numeric(pull(prob1_df, samp))
-as.numeric(pull(prob1_df, samp_gt_0))
-as.numeric(pull(prob1_df, char_vec))
-as.numeric(pull(prob1_df, factor_vec))
-```
-
-I can convert logical and factor variables to numeric variables, but I can't do this for a character variable.
-
-```{r eval = FALSE}
-as.numeric(pull(prob1_df, samp_gt_0)) * pull(prob1_df, samp)
-as.factor(pull(prob1_df, samp_gt_0)) * pull(prob1_df, samp)
-as.numeric(as.factor(pull(prob1_df, samp_gt_0))) * pull(prob1_df, samp)
-```
-
-I can convert a logical variable to a numerical and then multiply it by the random sample, but I can't multiply factor variables by the random sample. However, I can convert the logical variable to a factor variable and then to numeric and then multiply by the random sample. However, this gives me a different result compared to converting the logical variable directly to a numeric variable.
 
 ## Problem 2
 
-```{r}
-data("penguins", package = "palmerpenguins")
-
-names(penguins)
-nrow(penguins)
-ncol(penguins)
-mean(penguins$flipper_length_mm, na.rm=TRUE)
-summary(penguins)
-
-```
-
-The penguins dataset includes the 8 variables: "species", "island", "bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g", "sex", and "year". It includes 344 observations (rows), and, again 8 variables (columns). The mean flipper length, once the missing values were removed, is 200.9152 mm. Values for "species" in this data set include "Adelie", "Chinstrap", and "Gentoo". Also, values for "island" include "Biscoe", "Dream", and "Torgersen". 
-
-
-```{r}
-penguins %>%
-    ggplot (aes(x = bill_length_mm, y = flipper_length_mm, color = species)) +
-  geom_point(alpha = .5) +
-  geom_smooth(se = FALSE) +
-  theme(legend.position = "bottom")
-ggsave("penguins_scatter_plot.pdf", height = 4, width = 6)
-```
-
-
-
-
-
-
-
-
+## Problem 3
