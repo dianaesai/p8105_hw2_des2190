@@ -16,7 +16,7 @@ library(readxl)
 Read the Mr. Trashwheel data set.
 
 ```{r}
-trashweel_df=
+trashwheel_df=
   read_xlsx(
     "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", 
     sheet = "Mr. Trash Wheel", 
@@ -72,9 +72,49 @@ left_join(precip_df, month_df, by = "month")
 
 Summarize Mr. Trash Wheel data
 
-This dataset contains information from the MR. Trashwheel trash collector in Baltimore. As trash enters the inner harbor, the trashweel collects that trash, and stores it in a dumpstore. The dataset contains information on year, month, and trash collected, including some specific kinds of trash. There are a total of `r nrow(trashweel_df)` rows in our final document. Additional data sets include month precipitation data.
+This dataset contains information from the MR. Trashwheel trash collector in Baltimore. As trash enters the inner harbor, the trashweel collects that trash, and stores it in a dumpstore. The dataset contains information on year, month, and trash collected, including some specific kinds of trash. There are a total of `r nrow(trashwheel_df)` rows in our final document. Additional data sets include month precipitation data. The median number of sports balls found in a dumpster in 2017 was `r trashwheel_df %>% filter(year == 2017) %>% pull(sports_balls) %>% median()` sports balls. The total precipitation in 2018 was `r precip_df %>% filter(year == 2018) %>% pull(total) %>% sum()` inches.
 
 
 ## Problem 2
 
+Read NYC Transit data.
+
+```{r}
+transit_df=
+  read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  janitor::clean_names() %>%
+  select(line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada) %>%
+  mutate(entry = recode(entry, "YES" = T, "NO" = F))
+```
+
+```{r}
+stations = distinct(transit_df, line, station_name, ada)
+```
+
+The dataset contains transit data for NYC, specifically related to entrances and exits of each subway station. It includes the variables line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, and ada. The dimensions of the data set are `r nrow(transit_df)` rows x `r ncol(transit_df)` columns.
+
+IS THIS DATA TIDY?
+
+There are `r nrow(stations)` distinct stations. 
+
+```{r}
+stations2=
+ mutate(filter (stations, ada == "TRUE"))
+```
+
+There are `r nrow(stations2)` ada compliant stations.
+
+```{r}
+no_vending=
+  mutate(filter (transit_df, vending == "NO"))
+```
+
+```{r}
+allow_entrance= 
+  mutate(filter (no_vending, entry == "TRUE"))
+```
+
+`r nrow(allow_entrance)/ nrow(no_vending)`
+
 ## Problem 3
+

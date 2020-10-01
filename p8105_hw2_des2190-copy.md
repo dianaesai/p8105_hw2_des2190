@@ -28,7 +28,7 @@ library(readxl)
 Read the Mr. Trashwheel data set.
 
 ``` r
-trashweel_df=
+trashwheel_df=
   read_xlsx(
     "./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", 
     sheet = "Mr. Trash Wheel", 
@@ -104,8 +104,71 @@ collector in Baltimore. As trash enters the inner harbor, the trashweel
 collects that trash, and stores it in a dumpstore. The dataset contains
 information on year, month, and trash collected, including some specific
 kinds of trash. There are a total of 344 rows in our final document.
-Additional data sets include month precipitation data.
+Additional data sets include month precipitation data. The median number
+of sports balls found in a dumpster in 2017 was 8 sports balls. The
+total precipitation in 2018 was 70.33 inches.
 
 ## Problem 2
+
+Read NYC Transit data.
+
+``` r
+transit_df=
+  read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  janitor::clean_names() %>%
+  select(line, station_name, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, station_latitude, station_longitude, entry, vending, entrance_type, ada) %>%
+  mutate(entry = recode(entry, "YES" = T, "NO" = F))
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   .default = col_character(),
+    ##   `Station Latitude` = col_double(),
+    ##   `Station Longitude` = col_double(),
+    ##   Route8 = col_double(),
+    ##   Route9 = col_double(),
+    ##   Route10 = col_double(),
+    ##   Route11 = col_double(),
+    ##   ADA = col_logical(),
+    ##   `Free Crossover` = col_logical(),
+    ##   `Entrance Latitude` = col_double(),
+    ##   `Entrance Longitude` = col_double()
+    ## )
+
+    ## See spec(...) for full column specifications.
+
+``` r
+stations = distinct(transit_df, line, station_name, ada)
+```
+
+The dataset contains transit data for NYC, specifically related to
+entrances and exits of each subway station. It includes the variables
+line, station\_name, route1, route2, route3, route4, route5, route6,
+route7, route8, route9, route10, route11, station\_latitude,
+station\_longitude, entry, vending, entrance\_type, and ada. The
+dimensions of the data set are 1868 rows x 19 columns.
+
+IS THIS DATA TIDY?
+
+There are 465 distinct stations.
+
+``` r
+stations2=
+ mutate(filter (stations, ada == "TRUE"))
+```
+
+There are 84 ada compliant stations.
+
+``` r
+no_vending=
+  mutate(filter (transit_df, vending == "NO"))
+```
+
+``` r
+allow_entrance= 
+  mutate(filter (no_vending, entry == "TRUE"))
+```
+
+0.3770492
 
 ## Problem 3
