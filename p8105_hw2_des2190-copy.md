@@ -169,6 +169,31 @@ allow_entrance=
   mutate(filter (no_vending, entry == "TRUE"))
 ```
 
-0.3770492
+The proportion of station entrances / exits without vending allow
+entrance is 0.3770492.
 
 ## Problem 3
+
+``` r
+pols_month = 
+  read_csv(
+    "./data/pols-month.csv") %>% 
+separate (mon, into= c("Month", "Day", "Year"), sep = "/", 
+)
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   mon = col_date(format = ""),
+    ##   prez_gop = col_double(),
+    ##   gov_gop = col_double(),
+    ##   sen_gop = col_double(),
+    ##   rep_gop = col_double(),
+    ##   prez_dem = col_double(),
+    ##   gov_dem = col_double(),
+    ##   sen_dem = col_double(),
+    ##   rep_dem = col_double()
+    ## )
+
+    ## Warning: Expected 3 pieces. Missing pieces filled with `NA` in 822 rows [1, 2,
+    ## 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].

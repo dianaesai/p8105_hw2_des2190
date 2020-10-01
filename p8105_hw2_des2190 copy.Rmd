@@ -114,7 +114,13 @@ allow_entrance=
   mutate(filter (no_vending, entry == "TRUE"))
 ```
 
-`r nrow(allow_entrance)/ nrow(no_vending)`
+The proportion of station entrances / exits without vending allow entrance is `r nrow(allow_entrance)/ nrow(no_vending)`.
 
 ## Problem 3
-
+```{r}
+pols_month = 
+  read_csv(
+    "./data/pols-month.csv") %>% 
+separate (mon, into= c("Month", "Day", "Year"), sep = "/", 
+)
+```
