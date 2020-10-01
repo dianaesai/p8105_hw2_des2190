@@ -148,7 +148,7 @@ route7, route8, route9, route10, route11, station\_latitude,
 station\_longitude, entry, vending, entrance\_type, and ada. The
 dimensions of the data set are 1868 rows x 19 columns.
 
-IS THIS DATA TIDY?
+This is not tidy data.
 
 There are 465 distinct stations.
 
@@ -174,12 +174,14 @@ entrance is 0.3770492.
 
 ## Problem 3
 
+Clean pol-month data
+
 ``` r
 pols_month = 
   read_csv(
-    "./data/pols-month.csv") %>% 
-separate (mon, into= c("Month", "Day", "Year"), sep = "/", 
-)
+    "./data/pols-month.csv") %>%
+  separate(mon, into = c("year", "month", "day")) %>%
+  mutate(month= as.integer(month))
 ```
 
     ## Parsed with column specification:
@@ -195,5 +197,89 @@ separate (mon, into= c("Month", "Day", "Year"), sep = "/",
     ##   rep_dem = col_double()
     ## )
 
-    ## Warning: Expected 3 pieces. Missing pieces filled with `NA` in 822 rows [1, 2,
-    ## 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].
+``` r
+month_df=
+  tibble(
+    month = 01:12,
+    month_name = month.name)
+
+pols_month = left_join(pols_month, month_df, by = "month")
+
+polls_month_mutate = pols_month %>%
+  mutate(president = ifelse(prez_dem == 1, "dem", "gop"))
+
+polls_month_mutate2 = 
+select(polls_month_mutate, - prez_gop, - prez_dem, - month) %>%
+relocate (year, month_name)
+```
+
+Clean snp data.
+
+``` r
+snp = 
+  read_csv(
+    "./data/snp.csv") %>%
+  separate(date, into = c("month", "day", "year")) %>%
+  mutate(month= as.integer(month))
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   date = col_character(),
+    ##   close = col_double()
+    ## )
+
+``` r
+month_df=
+  tibble(
+    month = 01:12,
+    month_name = month.name)
+
+snp2 = 
+  left_join(snp, month_df, by = "month") %>%
+  select(- month) %>%
+  relocate (year, month_name)
+```
+
+Clean unemployment data.
+
+``` r
+unemployment = 
+  read_csv(
+    "./data/unemployment.csv") %>%
+  pivot_longer(
+    Jan:Dec,
+    names_to = "month",
+    values_to = "unemploy"
+  )
+```
+
+    ## Parsed with column specification:
+    ## cols(
+    ##   Year = col_double(),
+    ##   Jan = col_double(),
+    ##   Feb = col_double(),
+    ##   Mar = col_double(),
+    ##   Apr = col_double(),
+    ##   May = col_double(),
+    ##   Jun = col_double(),
+    ##   Jul = col_double(),
+    ##   Aug = col_double(),
+    ##   Sep = col_double(),
+    ##   Oct = col_double(),
+    ##   Nov = col_double(),
+    ##   Dec = col_double()
+    ## )
+
+``` r
+month_df2=
+  tibble(
+    month = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
+    month_name = month.name)
+
+unemploy_tidy = 
+  left_join(unemployment, month_df2, by = "month") %>%
+  select(- month) %>%
+  relocate(Year, month_name) %>%
+  janitor::clean_names()
+```
